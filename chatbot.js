@@ -1,247 +1,415 @@
-/* Smart Library - Gemini AI Library Assistant (Free & Direct) */
+// ========================================
+// SMART LIBRARY - DASHBOARD JAVASCRIPT
+// ========================================
 
-const libraryBooks = [
-    {
-        title: "Clean Code",
-        author: "Robert C. Martin",
-        category: "Programming",
-        description: "Learn to write clean, readable, maintainable code."
-    },
-    {
-        title: "Introduction to Algorithms",
-        author: "Thomas H. Cormen",
-        category: "Programming",
-        description: "Learn algorithms and problem-solving techniques."
-    },
-    {
-        title: "Artificial Intelligence",
-        author: "Stuart Russell",
-        category: "AI",
-        description: "Explore intelligent systems and AI fundamentals."
-    },
-    {
-        title: "Deep Learning",
-        author: "Ian Goodfellow",
-        category: "AI",
-        description: "Learn about neural networks and deep learning."
-    },
-    {
-        title: "The Design of Everyday Things",
-        author: "Don Norman",
-        category: "Design",
-        description: "Understand the principles of user-centered design."
-    },
-    {
-        title: "The Lean Startup",
-        author: "Eric Ries",
-        category: "Business",
-        description: "Discover ideas for building and testing businesses."
+"use strict";
+
+// Local storage keys
+const STORAGE_KEYS = {
+    account: "smartLibraryAccount",
+    books: "myBooks",
+    favorites: "favorites",
+    payments: "myPayments"
+};
+
+// ========================================
+// 1. STORAGE FUNCTIONS
+// ========================================
+
+function getData(key, defaultValue = []) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (error) {
+        console.error("Error reading data:", error);
+        return defaultValue;
     }
-];
+}
 
-(function initLibraryAssistant() {
-    if (document.getElementById("libraryChatWidget")) return;
-
-    const styleLink = document.createElement("link");
-    styleLink.rel = "stylesheet";
-    styleLink.href = "css/chatbot.css";
-    document.head.appendChild(styleLink);
-
-    const widget = document.createElement("section");
-    widget.id = "libraryChatWidget";
-    widget.className = "library-chat-widget";
-
-    widget.innerHTML = `
-        <button class="chat-launcher" id="chatLauncher"
-                type="button"
-                aria-label="Open AI Library Assistant"
-                aria-expanded="false">
-            <span class="chat-launcher-icon">✦</span>
-            <span class="chat-notification"></span>
-        </button>
-
-        <section class="chat-window" id="chatWindow"
-                 aria-label="AI Library Assistant" hidden>
-            <header class="chat-header">
-                <div class="chat-avatar">✦</div>
-
-                <div class="chat-header-text">
-                    <h2>AI Library Assistant</h2>
-                    <p>
-                        <span class="online-dot"></span>
-                        AI Assistant
-                    </p>
-                </div>
-
-                <button class="chat-close" id="chatClose"
-                        type="button"
-                        aria-label="Close chat">×</button>
-            </header>
-
-            <div class="chat-messages" id="chatMessages"
-                 aria-live="polite"
-                 aria-label="Conversation"></div>
-
-            <div class="chat-suggestions" id="chatSuggestions">
-                <button type="button" data-prompt="Recommend AI books">
-                    🤖 AI Books
-                </button>
-                <button type="button" data-prompt="Recommend Programming books">
-                    💻 Programming
-                </button>
-                <button type="button" data-prompt="I am a beginner. Help me choose a book">
-                    🌱 Beginner
-                </button>
-            </div>
-
-            <form class="chat-input-area" id="chatForm">
-                <input id="chatInput"
-                       type="text"
-                       placeholder="Ask me about books..."
-                       aria-label="Your message"
-                       autocomplete="off"
-                       maxlength="1000"
-                       required>
-                <button type="submit"
-                        id="chatSendButton"
-                        aria-label="Send message">➤</button>
-            </form>
-
-            <p class="chat-disclaimer">
-                AI-powered book assistant
-            </p>
-        </section>
-    `;
-
-    document.body.appendChild(widget);
-
-    const launcher = document.getElementById("chatLauncher");
-    const chatWindow = document.getElementById("chatWindow");
-    const closeButton = document.getElementById("chatClose");
-    const messages = document.getElementById("chatMessages");
-    const form = document.getElementById("chatForm");
-    const input = document.getElementById("chatInput");
-    const sendButton = document.getElementById("chatSendButton");
-    const suggestions = document.getElementById("chatSuggestions");
-
-    let isSending = false;
-
-    function addMessage(text, sender = "bot") {
-        const bubble = document.createElement("div");
-        bubble.className = `chat-message ${sender}`;
-        bubble.textContent = text;
-
-        messages.appendChild(bubble);
-        messages.scrollTop = messages.scrollHeight;
-
-        return bubble;
+function saveData(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (error) {
+        console.error("Error saving data:", error);
+        alert("Could not save your data. Please try again.");
+        return false;
     }
+}
 
-    // Send a message directly to Gemini API (Free & No Server required)
-    async function sendMessage(text) {
-        const message = text.trim();
+// Ensure data is always an array
+function getArray(key) {
+    const data = getData(key, []);
+    return Array.isArray(data) ? data : [];
+}
 
-        if (!message || isSending) return;
+// Safely display text inside HTML
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
 
-        addMessage(message, "user");
-
-        isSending = true;
-        input.disabled = true;
-        sendButton.disabled = true;
-
-        const loadingMessage = addMessage("Thinking... 🤖", "bot");
-
-        try {
-            // حطي مفتاح Gemini الخاص بكِ هنا بين العلامتين
-            const GEMINI_API_KEY = "حطي_مفتاح_جيميني_هنا"; 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-            const promptText = `Available books in Smart Library: ${JSON.stringify(libraryBooks)}. User question: ${message}`;
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }]
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error?.message || "Request failed.");
-            }
-
-            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (!reply) {
-                throw new Error("The AI returned an empty response.");
-            }
-
-            loadingMessage.textContent = reply;
-
-        } catch (error) {
-            console.error("Smart Library AI error:", error);
-            loadingMessage.textContent = "Sorry, I couldn't connect to the AI. Please check your API key.";
-        } finally {
-            isSending = false;
-            input.disabled = false;
-            sendButton.disabled = false;
-            input.focus();
-        }
-    }
-
-    function openChat() {
-        chatWindow.hidden = false;
-        launcher.setAttribute("aria-expanded", "true");
-        launcher.classList.add("is-open");
-        input.focus();
-
-        if (!messages.dataset.initialized) {
-            addMessage(
-                "Hi! 👋 I'm your Smart Library AI Assistant. " +
-                "Ask me a question or tell me what you want to learn, " +
-                "and I'll help you explore books."
-            );
-            messages.dataset.initialized = "true";
-        }
-    }
-
-    function closeChat() {
-        chatWindow.hidden = true;
-        launcher.setAttribute("aria-expanded", "false");
-        launcher.classList.remove("is-open");
-        launcher.focus();
-    }
-
-    launcher.addEventListener("click", () => {
-        if (chatWindow.hidden) {
-            openChat();
-        } else {
-            closeChat();
-        }
+        return entities[character];
     });
+}
 
-    closeButton.addEventListener("click", closeChat);
+// Support book objects and simple book titles
+function getBookTitle(book) {
+    if (typeof book === "string") {
+        return book;
+    }
 
-    form.addEventListener("submit", async event => {
+    return book?.title || book?.name || "Untitled Book";
+}
+
+function getBookAuthor(book) {
+    if (typeof book === "string") {
+        return "Saved book";
+    }
+
+    return book?.author || "Unknown Author";
+}
+
+function getBookCover(book) {
+    if (typeof book === "string") {
+        return "";
+    }
+
+    return book?.cover || book?.image || book?.thumbnail || "";
+}
+
+function getBookId(book) {
+    if (typeof book === "string") {
+        return book.trim().toLowerCase();
+    }
+
+    return String(
+        book?.id ??
+        book?.bookId ??
+        getBookTitle(book).trim().toLowerCase()
+    );
+}
+
+// ========================================
+// 2. ACCOUNT INFORMATION
+// ========================================
+
+const accountForm = document.getElementById("accountForm");
+const accountMessage = document.getElementById("accountMessage");
+
+function loadAccount() {
+    const account = getData(
+        STORAGE_KEYS.account,
+        getData("user", {})
+    );
+
+    document.getElementById("userName").value =
+        account.name || account.fullName || "";
+
+    document.getElementById("userEmail").value =
+        account.email || "";
+
+    document.getElementById("userPhone").value =
+        account.phone || account.phoneNumber || "";
+}
+
+if (accountForm) {
+    accountForm.addEventListener("submit", function (event) {
         event.preventDefault();
-        if (isSending) return;
 
-        const message = input.value.trim();
-        if (!message) return;
+        const name = document.getElementById("userName").value.trim();
+        const email = document.getElementById("userEmail").value.trim();
+        const phone = document.getElementById("userPhone").value.trim();
 
-        input.value = "";
-        await sendMessage(message);
+        if (!name || !email) {
+            accountMessage.textContent =
+                "Please enter your name and email.";
+
+            return;
+        }
+
+        const account = {
+            name: name,
+            email: email,
+            phone: phone
+        };
+
+        const saved = saveData(STORAGE_KEYS.account, account);
+
+        if (saved && accountMessage) {
+            accountMessage.textContent =
+                "Account information saved successfully!";
+        }
     });
+}
 
-    suggestions.addEventListener("click", event => {
-        const button = event.target.closest("[data-prompt]");
-        if (!button || isSending) return;
+// ========================================
+// 3. MY BOOKS
+// ========================================
 
-        sendMessage(button.dataset.prompt);
-    });
+function renderMyBooks() {
+    const books = getArray(STORAGE_KEYS.books);
+    const booksList = document.getElementById("myBooksList");
+    const booksCount = document.getElementById("booksCount");
 
-})();
+    if (!booksList || !booksCount) {
+        return;
+    }
+
+    booksCount.textContent = books.length;
+
+    if (books.length === 0) {
+        booksList.innerHTML = `<p class="empty-message">You haven't added any books yet.</p>`;
+        return;
+    }
+
+    booksList.innerHTML = books.map((book, index) => {
+        const title = escapeHTML(getBookTitle(book));
+        const author = escapeHTML(getBookAuthor(book));
+        const cover = getBookCover(book);
+
+        const coverHTML = cover
+            ? `<img src="${escapeHTML(cover)}" alt="${title}">`
+            : "📖";
+
+        return `
+            <div class="book-item">
+                <div class="book-item-cover">${coverHTML}</div>
+                <div class="book-item-info">
+                    <h4>${title}</h4>
+                    <p>By ${author}</p>
+                </div>
+                <div class="book-item-actions">
+                    <button class="small-btn" data-action="add-favorite" data-index="${index}">♥ Favorite</button>
+                    <button class="small-btn delete-btn" data-action="delete-book" data-index="${index}">Delete</button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+// ========================================
+// 4. FAVORITE LIST
+// ========================================
+
+function renderFavorites() {
+    const favorites = getArray(STORAGE_KEYS.favorites);
+    const favoritesList = document.getElementById("favoritesList");
+    const favoritesCount = document.getElementById("favoritesCount");
+
+    if (!favoritesList || !favoritesCount) {
+        return;
+    }
+
+    favoritesCount.textContent = favorites.length;
+
+    if (favorites.length === 0) {
+        favoritesList.innerHTML = `
+            <p class="empty-message">
+                💜 You haven't added any favorite books yet.
+            </p>
+        `;
+        return;
+    }
+
+    favoritesList.innerHTML = favorites.map((book, index) => {
+        const title = escapeHTML(getBookTitle(book));
+        const author = escapeHTML(getBookAuthor(book));
+        const cover = getBookCover(book);
+
+        const coverHTML = cover
+            ? `<img src="${escapeHTML(cover)}" alt="${title}" class="book-cover">`
+            : "💜";
+
+        return `
+            <div class="book-item">
+                <div class="book-item-cover">${coverHTML}</div>
+                <div class="book-item-info">
+                    <h4>${title}</h4>
+                    <p>By ${author}</p>
+                </div>
+                <div class="book-item-actions">
+                    <button class="small-btn delete-btn" data-action="delete-favorite" data-index="${index}">Remove</button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+// ========================================
+// 5. PAYMENT HISTORY
+// ========================================
+
+function renderPayments() {
+    const payments = getArray(STORAGE_KEYS.payments);
+
+    const paymentsList = document.getElementById("paymentsList");
+    const paymentsCount = document.getElementById("paymentsCount");
+    const completedCount = document.getElementById("completedCount");
+    const totalPayments = document.getElementById("totalPayments");
+
+    if (!paymentsList) {
+        return;
+    }
+
+    if (paymentsCount) {
+        paymentsCount.textContent = payments.length;
+    }
+
+    const completedPayments = payments.filter(payment =>
+        String(payment.status || "").toLowerCase() === "completed"
+    );
+
+    if (completedCount) {
+        completedCount.textContent = completedPayments.length;
+    }
+
+    const total = completedPayments.reduce((sum, payment) => {
+        return sum + (Number(payment.amount) || 0);
+    }, 0);
+
+    if (totalPayments) {
+        totalPayments.textContent =
+            total.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " EGP";
+    }
+
+    if (payments.length === 0) {
+        paymentsList.innerHTML = `
+            <p class="empty-message">
+                💳 You haven't made any payments yet.
+            </p>
+        `;
+        return;
+    }
+
+    paymentsList.innerHTML = payments.map(payment => {
+        const title = escapeHTML(
+            payment.title || payment.description || "Library purchase"
+        );
+
+        const date = escapeHTML(
+            payment.date || "Date not available"
+        );
+
+        const amount = (Number(payment.amount) || 0).toLocaleString(
+            "en-US",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+        const rawStatus = String(payment.status || "pending").toLowerCase();
+
+        const status = ["completed", "pending", "failed"].includes(rawStatus)
+            ? rawStatus
+            : "pending";
+
+        return `
+            <div class="payment-item">
+                <div>
+                    <h4>${title}</h4>
+                    <p>${date}</p>
+                </div>
+                <div class="payment-details">
+                    <strong>${amount} EGP</strong>
+                    <span class="status-badge ${status}">${status}</span>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+// ========================================
+// 6. BUTTON ACTIONS
+// ========================================
+
+document.addEventListener("click", function (event) {
+    const button = event.target.closest("[data-action]");
+
+    if (!button) {
+        return;
+    }
+
+    const action = button.dataset.action;
+    const index = Number(button.dataset.index);
+
+    if (!Number.isInteger(index) || index < 0) {
+        return;
+    }
+
+    if (action === "delete-book") {
+        const books = getArray(STORAGE_KEYS.books);
+
+        if (index >= books.length) {
+            return;
+        }
+
+        books.splice(index, 1);
+
+        if (saveData(STORAGE_KEYS.books, books)) {
+            renderMyBooks();
+        }
+    }
+
+    if (action === "add-favorite") {
+        const books = getArray(STORAGE_KEYS.books);
+        const favorites = getArray(STORAGE_KEYS.favorites);
+        const book = books[index];
+
+        if (!book) {
+            return;
+        }
+
+        const alreadyFavorite = favorites.some(favorite =>
+            getBookId(favorite) === getBookId(book)
+        );
+
+        if (alreadyFavorite) {
+            alert("This book is already in your favorites.");
+            return;
+        }
+
+        favorites.push(book);
+
+        if (saveData(STORAGE_KEYS.favorites, favorites)) {
+            renderFavorites();
+            alert("Book added to your favorites!");
+        }
+    }
+
+    if (action === "delete-favorite") {
+        const favorites = getArray(STORAGE_KEYS.favorites);
+
+        if (index >= favorites.length) {
+            return;
+        }
+
+        favorites.splice(index, 1);
+
+        if (saveData(STORAGE_KEYS.favorites, favorites)) {
+            renderFavorites();
+        }
+    }
+});
+
+// ========================================
+// 7. INITIALIZE DASHBOARD
+// ========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadAccount();
+    renderMyBooks();
+    renderFavorites();
+    renderPayments();
+
+    console.log("Smart Library Dashboard is ready.");
+});
