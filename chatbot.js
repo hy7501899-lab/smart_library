@@ -1,4 +1,4 @@
-/* Smart Library - Gemini AI Library Assistant (Free & Direct) */
+/* Smart Library - Real Gemini AI Assistant */
 
 const libraryBooks = [
     {
@@ -69,7 +69,7 @@ const libraryBooks = [
                     <h2>AI Library Assistant</h2>
                     <p>
                         <span class="online-dot"></span>
-                        AI Assistant
+                        Gemini AI Active
                     </p>
                 </div>
 
@@ -108,7 +108,7 @@ const libraryBooks = [
             </form>
 
             <p class="chat-disclaimer">
-                AI-powered assistant
+                Powered by Gemini LLM
             </p>
         </section>
     `;
@@ -137,7 +137,7 @@ const libraryBooks = [
         return bubble;
     }
 
-    // Send a message directly to Gemini API (Free & No Server required)
+    // الاتصال الفعلي بـ Gemini LLM API مع تضمين المفتاح
     async function sendMessage(text) {
         const message = text.trim();
 
@@ -152,15 +152,11 @@ const libraryBooks = [
         const loadingMessage = addMessage("Thinking... 🤖", "bot");
 
         try {
-            // حطي مفتاح Gemini الخاص بكِ هنا بين العلامتين
-            const GEMINI_API_KEY = "حطي_مفتاح_جيميني_هنا"; 
+            const GEMINI_API_KEY = "AQ.Ab8RN6KUEG9Pbru27rkT7vA-mY663JVt9FN1fZOE1guDZP0N4Q"; 
+
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-            // تم توسيع الـ Prompt هنا لكي يجيب على أي سؤال عام ومع توفير ترشيح الكتب لو ناسب السياق
-            const promptText = `You are a highly intelligent and helpful AI assistant for the Smart Library. 
-You can answer ANY question the user asks about programming, science, general knowledge, life, or any other topic accurately and professionally. 
-Additionally, keep in mind our available library books: ${JSON.stringify(libraryBooks)}. If the user's question relates to these books or topics, recommend them naturally. 
-User question: ${message}`;
+            const systemPrompt = `You are a smart, friendly, and expert AI assistant for Smart Library. You can answer ANY question about programming, science, general knowledge, or any topic the user asks. Also, keep in mind our library books collection: ${JSON.stringify(libraryBooks)}. If the user asks about book recommendations or learning paths, suggest books from this list. User question: ${message}`;
 
             const response = await fetch(url, {
                 method: "POST",
@@ -168,27 +164,31 @@ User question: ${message}`;
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }]
+                    contents: [
+                        {
+                            parts: [{ text: systemPrompt }]
+                        }
+                    ]
                 })
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error?.message || "Request failed.");
+                throw new Error(data.error?.message || "Failed to connect to Gemini API.");
             }
 
             const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!reply) {
-                throw new Error("The AI returned an empty response.");
+                throw new Error("Received empty response from LLM.");
             }
 
             loadingMessage.textContent = reply;
 
         } catch (error) {
-            console.error("Smart Library AI error:", error);
-            loadingMessage.textContent = "Sorry, I couldn't connect to the AI. Please check your API key.";
+            console.error("Gemini API Error:", error);
+            loadingMessage.textContent = "Error: " + error.message;
         } finally {
             isSending = false;
             input.disabled = false;
@@ -205,8 +205,7 @@ User question: ${message}`;
 
         if (!messages.dataset.initialized) {
             addMessage(
-                "Hi! 👋 I'm your Smart Library AI Assistant. " +
-                "You can ask me anything about books, programming, or any general question!"
+                "Hi! 👋 I'm your Gemini AI Assistant. Ask me anything about programming, books, or general topics!"
             );
             messages.dataset.initialized = "true";
         }
