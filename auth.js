@@ -1,4 +1,3 @@
-
 const USERS_KEY = "smartLibraryUsers";
 const SESSION_KEY = "smartLibraryCurrentUser";
 
@@ -100,7 +99,7 @@ if (loginForm) {
             message.textContent = "Login successful!";
 
             setTimeout(() => {
-                window.location.href = "home.html";
+                window.location.href = "index.html"; // ✅ تم التعديل لتوجيه المستخدم للصفحة الرئيسية الصحيحة بدون 404
             }, 700);
         } catch {
             message.textContent =
