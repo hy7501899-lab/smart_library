@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#211536">
     <title>Smart Library | Home</title>
     <link rel="stylesheet" href="style.css">
+    <script src="auth.js" defer></script>
     <script src="chatbot.js" defer></script>
 </head>
 <body class="home-page">
@@ -17,9 +18,9 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="catalogue.html">Catalogue</a>
-            <a href="login.html">Login</a>
+            <a href="login.html" id="authLink">Login</a>
             <a href="dashboard.html">Dashboard</a>
-            <a href="register.html" class="nav-btn">Get Started</a>
+            <a href="register.html" class="nav-btn" id="registerLink">Get Started</a>
         </nav>
     </header>
 
@@ -158,18 +159,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- AI Chatbot Floating Box -->
-        <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #211536; padding: 15px; border-radius: 12px; color: white; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <h3 style="margin-top:0; font-size: 16px;">🤖 AI Library Assistant</h3>
-            <div id="chat-messages" style="height: 150px; overflow-y: auto; background: #150d24; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
-                <p><strong>Bot:</strong> Hello! Ask me anything about our books!</p>
-            </div>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="user-input" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 5px; border: none; font-size: 12px;">
-                <button onclick="sendChatMessage()" style="background: #bb86fc; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Send</button>
-            </div>
-        </div>
 
     </main>
 
