@@ -12,13 +12,13 @@
 
     <!-- Navigation -->
     <header class="navbar">
-        <a href="home.html" class="logo">📚 Smart Library</a>
+        <a href="index.html" class="logo">📚 Smart Library</a>
 
         <nav>
-            <a href="home.html">Home</a>
+            <a href="index.html">Home</a>
             <a href="catalogue.html">Catalogue</a>
             <a href="login.html">Login</a>
-            <a href="dashboard.html">Deshboard</a>
+            <a href="dashboard.html">Dashboard</a>
             <a href="register.html" class="nav-btn">Get Started</a>
         </nav>
     </header>
@@ -28,10 +28,6 @@
         <!-- Hero Section -->
         <section class="hero" id="home">
 
-            <video class="hero-video" autoplay muted loop playsinline>
-                <source src="./854417-uhd_3840_2160_25fps.mp4" type="video/mp4">
-            </video>
-
             <div class="hero-overlay"></div>
 
             <div class="hero-content">
@@ -39,7 +35,7 @@
                     Discover a World<br>
                     of <span>Knowledge</span>
                 </h1>
-                 <br><br>
+                <br><br>
                 <div class="hero-buttons">
                     <a href="catalogue.html" class="primary-btn">
                         Explore Books →
@@ -50,6 +46,7 @@
                 </div>
             </div>
         </section>
+
         <!-- Welcome Section -->
         <section class="welcome-section">
             <div class="welcome-text">
@@ -82,6 +79,7 @@
                 </p>
             </div>
         </section>
+
         <!-- Categories -->
         <section class="home-categories-section" id="categories">
             <div class="section-heading">
@@ -94,48 +92,42 @@
 
             <div class="home-categories-grid">
 
-                <a href="catalogue.html?category=programming"
-                   class="home-category-card">
+                <a href="catalogue.html?category=programming" class="home-category-card">
                     <span class="category-icon">💻</span>
                     <h3>Programming</h3>
                     <p>Code, algorithms, and software development.</p>
                     <span class="category-arrow">Explore →</span>
                 </a>
 
-                <a href="catalogue.html?category=artificial-intelligence"
-                   class="home-category-card">
+                <a href="catalogue.html?category=artificial-intelligence" class="home-category-card">
                     <span class="category-icon">🧠</span>
                     <h3>Artificial Intelligence</h3>
                     <p>Machine learning, neural networks, and smart systems.</p>
                     <span class="category-arrow">Explore →</span>
                 </a>
 
-                <a href="catalogue.html?category=design"
-                   class="home-category-card">
+                <a href="catalogue.html?category=design" class="home-category-card">
                     <span class="category-icon">🎨</span>
                     <h3>Design</h3>
                     <p>Creativity, visual communication, and user experience.</p>
                     <span class="category-arrow">Explore →</span>
                 </a>
 
-                <a href="catalogue.html?category=data-science"
-                   class="home-category-card">
+                <a href="catalogue.html?category=data-science" class="home-category-card">
                     <span class="category-icon">📊</span>
                     <h3>Data Science</h3>
                     <p>Data analysis, statistics, and meaningful insights.</p>
                     <span class="category-arrow">Explore →</span>
                 </a>
 
-                <a href="catalogue.html?category=business"
-                   class="home-category-card">
+                <a href="catalogue.html?category=business" class="home-category-card">
                     <span class="category-icon">💼</span>
                     <h3>Business</h3>
                     <p>Entrepreneurship, management, and innovation.</p>
                     <span class="category-arrow">Explore →</span>
                 </a>
 
-                <a href="catalogue.html?category=technology"
-                   class="home-category-card">
+                <a href="catalogue.html?category=technology" class="home-category-card">
                     <span class="category-icon">🌐</span>
                     <h3>Technology</h3>
                     <p>Discover modern technologies and digital ideas.</p>
@@ -144,6 +136,7 @@
 
             </div>
         </section>
+
         <!-- Call to Action -->
         <section class="home-cta-section">
             <div class="cta-content">
@@ -166,15 +159,26 @@
             </div>
         </section>
 
-    </main>
+        <!-- AI Chatbot Floating Box -->
+        <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #211536; padding: 15px; border-radius: 12px; color: white; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <h3 style="margin-top:0; font-size: 16px;">🤖 AI Library Assistant</h3>
+            <div id="chat-messages" style="height: 150px; overflow-y: auto; background: #150d24; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
+                <p><strong>Bot:</strong> Hello! Ask me anything about our books!</p>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="user-input" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 5px; border: none; font-size: 12px;">
+                <button onclick="sendChatMessage()" style="background: #bb86fc; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Send</button>
+            </div>
+        </div>
 
+    </main>
 
     <!-- Footer -->
     <footer class="home-footer" id="footer">
         <div class="footer-main">
 
             <div class="footer-about">
-                <a href="home.html" class="footer-logo">
+                <a href="index.html" class="footer-logo">
                     📚 Smart Library
                 </a>
 
@@ -191,7 +195,7 @@
 
             <div class="footer-column">
                 <h3>Explore</h3>
-                <a href="home.html">Home</a>
+                <a href="index.html">Home</a>
                 <a href="catalogue.html">All Books</a>
                 <a href="catalogue.html?category=programming">Programming</a>
                 <a href="catalogue.html?category=artificial-intelligence">
@@ -230,4 +234,3 @@
 
 </body>
 </html>
-
