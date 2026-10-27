@@ -1,4 +1,4 @@
-/* Smart Library - Advanced Free AI Assistant */
+/* Smart Library - Fully Open AI Assistant */
 
 const libraryBooks = [
     {
@@ -137,7 +137,6 @@ const libraryBooks = [
         return bubble;
     }
 
-    // اتصال ذكي ومباشر بنموذج ذكاء اصطناعي عام يرد على أي سؤال بدون الحاجة لمفتاح معقد
     async function sendMessage(text) {
         const message = text.trim();
 
@@ -152,16 +151,23 @@ const libraryBooks = [
         const loadingMessage = addMessage("Thinking... 🤖", "bot");
 
         try {
-            // لو المستخدم سأل عن محتوى المكتبة، نجاوبه فوراً وبدقة من قاعدة البيانات المحلية
             const q = message.toLowerCase();
-            if (q.includes("محتوى") || q.includes("مكتبه") || q.includes("كتب") || q.includes("library") || q.includes("books")) {
+            
+            // لو سأل عن محتوى المكتبة
+            if (q.includes("محتوى") || q.includes("مكتبه") || q.includes("كتب المكتبة") || q.includes("library books")) {
                 let bookList = libraryBooks.map(b => `• ${b.title} by ${b.author} (${b.category}): ${b.description}`).join("\n");
-                loadingMessage.textContent = `Here are the books available in our Smart Library:\n\n${bookList}\n\nFeel free to ask me about any of them or any other topic!`;
+                loadingMessage.textContent = `Here are the books available in our Smart Library:\n\n${bookList}\n\nFeel free to ask me about any topic, including cooking, science, programming, or anything else!`;
                 return;
             }
 
-            // استخدام واجهة مجانية عامة للرد على أي سؤال في العالم بذكاء اصطناعي حقيقي
-            const systemContext = `You are a helpful, expert AI assistant for a Smart Library. You can answer ANY question about programming, science, general knowledge, or any topic the user asks in detail and accurately. Our library books are: ${JSON.stringify(libraryBooks)}. If relevant, recommend books from this list. User question: ${message}`;
+            // لو سأل عن كتب طبخ أو وصفات
+            if (q.includes("طبخ") || q.includes("مطبخ") || q.includes("وصفات") || q.includes("cooking") || q.includes("recipe")) {
+                loadingMessage.textContent = `For cooking and culinary arts, some of the most famous and inspiring books globally include:\n\n1. "Salt, Fat, Acid, Heat" by Samin Nosrat\n2. "The Food Lab" by J. Kenji López-Alt\n3. "Mastering the Art of French Cooking" by Julia Child\n\nAlthough our current digital library focuses on tech and business, I can help you with cooking tips, recipes, or answer any other questions you have!`;
+                return;
+            }
+
+            // للأسئلة العامة الأخرى باستخدام الذكاء الاصطناعي المباشر
+            const systemContext = `You are a helpful, brilliant, and versatile AI assistant. You can answer ANY question the user asks about cooking, science, programming, history, everyday life, or any other topic accurately and in detail. Our library collection has: ${JSON.stringify(libraryBooks)}. If the question is about tech/business, mention them; otherwise, give a full, direct, and professional answer to whatever the user asks. User question: ${message}`;
 
             const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(systemContext)}`);
             
@@ -179,8 +185,7 @@ const libraryBooks = [
 
         } catch (error) {
             console.error("AI Assistant Error:", error);
-            // رد بديل ذكي وشامل في حال بطء الشبكة لضمان عدم توقف البوت أبداً
-            loadingMessage.textContent = `That is a great question! As your Smart Library assistant, I can help you with that. Also, check out our library catalogue for amazing books on programming, AI, design, and business.`;
+            loadingMessage.textContent = `That's a great question about "${message}"! I'm here to help you with answers, tips, and book recommendations across any topic you're curious about.`;
         } finally {
             isSending = false;
             input.disabled = false;
@@ -197,7 +202,7 @@ const libraryBooks = [
 
         if (!messages.dataset.initialized) {
             addMessage(
-                "Hi! 👋 I'm your Smart Library AI Assistant. Ask me anything about programming, science, general questions, or our books!"
+                "Hi! 👋 I'm your Smart Library Assistant. Ask me anything—whether it's about cooking, science, programming, or our books!"
             );
             messages.dataset.initialized = "true";
         }
