@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     const authLink = document.getElementById("authLink");
     const registerLink = document.getElementById("registerLink");
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
 
             localStorage.removeItem("smartLibraryCurrentUser");
-            window.location.href = "home.html";
+            window.location.href = "index.html"; // تم التعديل هنا لتوجيه المستخدم للصفحة الرئيسية الصحيحة
         });
     }
 });
