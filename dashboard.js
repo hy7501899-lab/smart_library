@@ -103,8 +103,6 @@ const accountForm = document.getElementById("accountForm");
 const accountMessage = document.getElementById("accountMessage");
 
 function loadAccount() {
-    // Read dashboard account data first.
-    // If unavailable, try the existing "user" key.
     const account = getData(
         STORAGE_KEYS.account,
         getData("user", {})
@@ -166,8 +164,7 @@ function renderMyBooks() {
     booksCount.textContent = books.length;
 
     if (books.length === 0) {
-     booksList.innerHTML = `<p>You haven't added any books yet.</p>`;
-
+        booksList.innerHTML = `<p class="empty-message">You haven't added any books yet.</p>`;
         return;
     }
 
@@ -177,9 +174,22 @@ function renderMyBooks() {
         const cover = getBookCover(book);
 
         const coverHTML = cover
-    ? `<img src="${escapeHTML(cover)}" alt="${title}">`
-    : "📖";
-        return ;
+            ? `<img src="${escapeHTML(cover)}" alt="${title}">`
+            : "📖";
+
+        return `
+            <div class="book-item">
+                <div class="book-item-cover">${coverHTML}</div>
+                <div class="book-item-info">
+                    <h4>${title}</h4>
+                    <p>By ${author}</p>
+                </div>
+                <div class="book-item-actions">
+                    <button class="small-btn" data-action="add-favorite" data-index="${index}">♥ Favorite</button>
+                    <button class="small-btn delete-btn" data-action="delete-book" data-index="${index}">Delete</button>
+                </div>
+            </div>
+        `;
     }).join("");
 }
 
@@ -199,14 +209,13 @@ function renderFavorites() {
     favoritesCount.textContent = favorites.length;
 
     if (favorites.length === 0) {
-    favoritesList.innerHTML = `
-        <p class="empty-message">
-            💜 You haven't added any favorite books yet.
-        </p>
-    `;
-
-    return;
-}
+        favoritesList.innerHTML = `
+            <p class="empty-message">
+                💜 You haven't added any favorite books yet.
+            </p>
+        `;
+        return;
+    }
 
     favoritesList.innerHTML = favorites.map((book, index) => {
         const title = escapeHTML(getBookTitle(book));
@@ -214,9 +223,21 @@ function renderFavorites() {
         const cover = getBookCover(book);
 
         const coverHTML = cover
-    ? `<img src="${escapeHTML(cover)}" alt="${title}" class="book-cover">`
-    : "💜";
-        return ;
+            ? `<img src="${escapeHTML(cover)}" alt="${title}" class="book-cover">`
+            : "💜";
+
+        return `
+            <div class="book-item">
+                <div class="book-item-cover">${coverHTML}</div>
+                <div class="book-item-info">
+                    <h4>${title}</h4>
+                    <p>By ${author}</p>
+                </div>
+                <div class="book-item-actions">
+                    <button class="small-btn delete-btn" data-action="delete-favorite" data-index="${index}">Remove</button>
+                </div>
+            </div>
+        `;
     }).join("");
 }
 
@@ -236,12 +257,10 @@ function renderPayments() {
         return;
     }
 
-    // Count all payment records
     if (paymentsCount) {
         paymentsCount.textContent = payments.length;
     }
 
-    // Count completed payments
     const completedPayments = payments.filter(payment =>
         String(payment.status || "").toLowerCase() === "completed"
     );
@@ -250,7 +269,6 @@ function renderPayments() {
         completedCount.textContent = completedPayments.length;
     }
 
-    // Calculate total completed payments only
     const total = completedPayments.reduce((sum, payment) => {
         return sum + (Number(payment.amount) || 0);
     }, 0);
@@ -264,14 +282,13 @@ function renderPayments() {
     }
 
     if (payments.length === 0) {
-    paymentsList.innerHTML = `
-        <p class="empty-message">
-            💳 You haven't made any payments yet.
-        </p>
-    `;
-
-    return;
-}
+        paymentsList.innerHTML = `
+            <p class="empty-message">
+                💳 You haven't made any payments yet.
+            </p>
+        `;
+        return;
+    }
 
     paymentsList.innerHTML = payments.map(payment => {
         const title = escapeHTML(
@@ -296,7 +313,18 @@ function renderPayments() {
             ? rawStatus
             : "pending";
 
-        return ;
+        return `
+            <div class="payment-item">
+                <div>
+                    <h4>${title}</h4>
+                    <p>${date}</p>
+                </div>
+                <div class="payment-details">
+                    <strong>${amount} EGP</strong>
+                    <span class="status-badge ${status}">${status}</span>
+                </div>
+            </div>
+        `;
     }).join("");
 }
 
@@ -318,7 +346,6 @@ document.addEventListener("click", function (event) {
         return;
     }
 
-    // Remove a book from My Books
     if (action === "delete-book") {
         const books = getArray(STORAGE_KEYS.books);
 
@@ -333,7 +360,6 @@ document.addEventListener("click", function (event) {
         }
     }
 
-    // Add a book to Favorites
     if (action === "add-favorite") {
         const books = getArray(STORAGE_KEYS.books);
         const favorites = getArray(STORAGE_KEYS.favorites);
@@ -360,7 +386,6 @@ document.addEventListener("click", function (event) {
         }
     }
 
-    // Remove a book from Favorites
     if (action === "delete-favorite") {
         const favorites = getArray(STORAGE_KEYS.favorites);
 
