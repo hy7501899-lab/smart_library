@@ -97,7 +97,7 @@ const libraryBooks = [
             <form class="chat-input-area" id="chatForm">
                 <input id="chatInput"
                        type="text"
-                       placeholder="Ask me about books..."
+                       placeholder="Ask me anything..."
                        aria-label="Your message"
                        autocomplete="off"
                        maxlength="1000"
@@ -108,7 +108,7 @@ const libraryBooks = [
             </form>
 
             <p class="chat-disclaimer">
-                AI-powered book assistant
+                AI-powered assistant
             </p>
         </section>
     `;
@@ -154,10 +154,13 @@ const libraryBooks = [
         try {
             // حطي مفتاح Gemini الخاص بكِ هنا بين العلامتين
             const GEMINI_API_KEY = "حطي_مفتاح_جيميني_هنا"; 
-            // تم تصحيح اسم الموديل هنا إلى gemini-1.5-flash الصحيح
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-            const promptText = `Available books in Smart Library: ${JSON.stringify(libraryBooks)}. User question: ${message}`;
+            // تم توسيع الـ Prompt هنا لكي يجيب على أي سؤال عام ومع توفير ترشيح الكتب لو ناسب السياق
+            const promptText = `You are a highly intelligent and helpful AI assistant for the Smart Library. 
+You can answer ANY question the user asks about programming, science, general knowledge, life, or any other topic accurately and professionally. 
+Additionally, keep in mind our available library books: ${JSON.stringify(libraryBooks)}. If the user's question relates to these books or topics, recommend them naturally. 
+User question: ${message}`;
 
             const response = await fetch(url, {
                 method: "POST",
@@ -203,8 +206,7 @@ const libraryBooks = [
         if (!messages.dataset.initialized) {
             addMessage(
                 "Hi! 👋 I'm your Smart Library AI Assistant. " +
-                "Ask me a question or tell me what you want to learn, " +
-                "and I'll help you explore books."
+                "You can ask me anything about books, programming, or any general question!"
             );
             messages.dataset.initialized = "true";
         }
