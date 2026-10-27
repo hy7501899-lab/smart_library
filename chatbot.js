@@ -1,8 +1,5 @@
+/* Smart Library - Gemini AI Library Assistant (Free & Direct) */
 
-/* Smart Library - OpenAI AI Library Assistant */
-
-// Demo catalog used by the chatbot.
-// Replace these sample books with your real library catalog when ready.
 const libraryBooks = [
     {
         title: "Clean Code",
@@ -43,16 +40,13 @@ const libraryBooks = [
 ];
 
 (function initLibraryAssistant() {
-    // Prevent creating the widget more than once.
     if (document.getElementById("libraryChatWidget")) return;
 
-    // Load the existing chatbot stylesheet.
     const styleLink = document.createElement("link");
     styleLink.rel = "stylesheet";
     styleLink.href = "css/chatbot.css";
     document.head.appendChild(styleLink);
 
-    // Create the chatbot interface.
     const widget = document.createElement("section");
     widget.id = "libraryChatWidget";
     widget.className = "library-chat-widget";
@@ -89,18 +83,13 @@ const libraryBooks = [
                  aria-label="Conversation"></div>
 
             <div class="chat-suggestions" id="chatSuggestions">
-                <button type="button"
-                        data-prompt="Recommend AI books">
+                <button type="button" data-prompt="Recommend AI books">
                     🤖 AI Books
                 </button>
-
-                <button type="button"
-                        data-prompt="Recommend Programming books">
+                <button type="button" data-prompt="Recommend Programming books">
                     💻 Programming
                 </button>
-
-                <button type="button"
-                        data-prompt="I am a beginner. Help me choose a book">
+                <button type="button" data-prompt="I am a beginner. Help me choose a book">
                     🌱 Beginner
                 </button>
             </div>
@@ -113,7 +102,6 @@ const libraryBooks = [
                        autocomplete="off"
                        maxlength="1000"
                        required>
-
                 <button type="submit"
                         id="chatSendButton"
                         aria-label="Send message">➤</button>
@@ -127,7 +115,6 @@ const libraryBooks = [
 
     document.body.appendChild(widget);
 
-    // Get interface elements.
     const launcher = document.getElementById("chatLauncher");
     const chatWindow = document.getElementById("chatWindow");
     const closeButton = document.getElementById("chatClose");
@@ -139,7 +126,6 @@ const libraryBooks = [
 
     let isSending = false;
 
-    // Display a message safely as plain text.
     function addMessage(text, sender = "bot") {
         const bubble = document.createElement("div");
         bubble.className = `chat-message ${sender}`;
@@ -151,45 +137,7 @@ const libraryBooks = [
         return bubble;
     }
 
-    // Display book recommendation cards.
-    function addRecommendations(books) {
-        if (!Array.isArray(books) || books.length === 0) {
-            addMessage("No matching books were found in the catalog.");
-            return;
-        }
-
-        addMessage("Here are some books you might like 📚");
-
-        books.forEach(book => {
-            const card = document.createElement("article");
-            card.className = "chat-book-card";
-
-            const title = document.createElement("h3");
-            title.textContent = book.title || "Untitled book";
-
-            const author = document.createElement("p");
-            author.textContent = `By ${book.author || "Unknown author"}`;
-
-            const category = document.createElement("span");
-            category.className = "chat-book-category";
-            category.textContent = book.category || "General";
-
-            const description = document.createElement("p");
-            description.textContent =
-                book.description || "No description available.";
-
-            const link = document.createElement("a");
-            link.href = "catalogue.html";
-            link.textContent = "Explore Catalogue →";
-
-            card.append(title, author, category, description, link);
-            messages.appendChild(card);
-        });
-
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    // Send a message to the Flask backend and receive an OpenAI response.
+    // Send a message directly to Gemini API (Free & No Server required)
     async function sendMessage(text) {
         const message = text.trim();
 
@@ -204,40 +152,39 @@ const libraryBooks = [
         const loadingMessage = addMessage("Thinking... 🤖", "bot");
 
         try {
-            // The API key stays on the backend, never in this JavaScript file.
-            const response = await fetch("/api/chat", {
+            // حطي مفتاح Gemini الخاص بكِ هنا بين العلامتين
+            const GEMINI_API_KEY = "حطي_مفتاح_جيميني_هنا"; 
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+            const promptText = `Available books in Smart Library: ${JSON.stringify(libraryBooks)}. User question: ${message}`;
+
+            const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    message: message,
-                    catalog: libraryBooks
+                    contents: [{ parts: [{ text: promptText }] }]
                 })
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(
-                    data.error || `Request failed (${response.status}).`
-                );
+                throw new Error(data.error?.message || "Request failed.");
             }
 
-            if (typeof data.reply !== "string" || !data.reply.trim()) {
+            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!reply) {
                 throw new Error("The AI returned an empty response.");
             }
 
-            // Show the real AI response.
-            loadingMessage.textContent = data.reply;
+            loadingMessage.textContent = reply;
 
         } catch (error) {
             console.error("Smart Library AI error:", error);
-
-            loadingMessage.textContent =
-                "Sorry, I couldn't connect to the AI. " +
-                "Please check that Flask is running and your OpenAI API " +
-                "settings are correct.";
+            loadingMessage.textContent = "Sorry, I couldn't connect to the AI. Please check your API key.";
         } finally {
             isSending = false;
             input.disabled = false;
@@ -246,7 +193,6 @@ const libraryBooks = [
         }
     }
 
-    // Open the chatbot.
     function openChat() {
         chatWindow.hidden = false;
         launcher.setAttribute("aria-expanded", "true");
@@ -259,12 +205,10 @@ const libraryBooks = [
                 "Ask me a question or tell me what you want to learn, " +
                 "and I'll help you explore books."
             );
-
             messages.dataset.initialized = "true";
         }
     }
 
-    // Close the chatbot.
     function closeChat() {
         chatWindow.hidden = true;
         launcher.setAttribute("aria-expanded", "false");
@@ -272,7 +216,6 @@ const libraryBooks = [
         launcher.focus();
     }
 
-    // Toggle the chat window.
     launcher.addEventListener("click", () => {
         if (chatWindow.hidden) {
             openChat();
@@ -283,10 +226,8 @@ const libraryBooks = [
 
     closeButton.addEventListener("click", closeChat);
 
-    // Submit a message when the user presses Send or Enter.
     form.addEventListener("submit", async event => {
         event.preventDefault();
-
         if (isSending) return;
 
         const message = input.value.trim();
@@ -296,10 +237,8 @@ const libraryBooks = [
         await sendMessage(message);
     });
 
-    // Send suggested prompts to the real AI model.
     suggestions.addEventListener("click", event => {
         const button = event.target.closest("[data-prompt]");
-
         if (!button || isSending) return;
 
         sendMessage(button.dataset.prompt);
