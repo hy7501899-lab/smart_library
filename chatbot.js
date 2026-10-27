@@ -1,4 +1,4 @@
-/* Smart Library - Fully Open AI Assistant */
+/* Smart Library - True Open AI Assistant */
 
 const libraryBooks = [
     {
@@ -66,10 +66,10 @@ const libraryBooks = [
                 <div class="chat-avatar">✦</div>
 
                 <div class="chat-header-text">
-                    <h2>AI Library Assistant</h2>
+                    <h2>AI Smart Assistant</h2>
                     <p>
                         <span class="online-dot"></span>
-                        AI Live Assistant
+                        Always Online
                     </p>
                 </div>
 
@@ -83,14 +83,14 @@ const libraryBooks = [
                  aria-label="Conversation"></div>
 
             <div class="chat-suggestions" id="chatSuggestions">
-                <button type="button" data-prompt="Recommend AI books">
-                    🤖 AI Books
-                </button>
-                <button type="button" data-prompt="Recommend Programming books">
-                    💻 Programming
-                </button>
-                <button type="button" data-prompt="What books do we have in the library?">
+                <button type="button" data-prompt="What books are in the library?">
                     📚 Library Books
+                </button>
+                <button type="button" data-prompt="Give me a quick recipe for pasta">
+                    🍳 Cooking Tips
+                </button>
+                <button type="button" data-prompt="How does AI work in simple words?">
+                    🤖 AI Explained
                 </button>
             </div>
 
@@ -108,7 +108,7 @@ const libraryBooks = [
             </form>
 
             <p class="chat-disclaimer">
-                Powered by AI LLM
+                Powered by AI Assistant
             </p>
         </section>
     `;
@@ -153,26 +153,20 @@ const libraryBooks = [
         try {
             const q = message.toLowerCase();
             
-            // لو سأل عن محتوى المكتبة
-            if (q.includes("محتوى") || q.includes("مكتبه") || q.includes("كتب المكتبة") || q.includes("library books")) {
+            // لو سأل عن كتب المكتبة بالذات، نعرضها له بشكل منظم
+            if (q.includes("محتوى") || q.includes("مكتبه") || q.includes("كتب المكتبة") || q.includes("library books") || (q.includes("books") && q.includes("what"))) {
                 let bookList = libraryBooks.map(b => `• ${b.title} by ${b.author} (${b.category}): ${b.description}`).join("\n");
-                loadingMessage.textContent = `Here are the books available in our Smart Library:\n\n${bookList}\n\nFeel free to ask me about any topic, including cooking, science, programming, or anything else!`;
+                loadingMessage.textContent = `Here are the books available in our Smart Library:\n\n${bookList}`;
                 return;
             }
 
-            // لو سأل عن كتب طبخ أو وصفات
-            if (q.includes("طبخ") || q.includes("مطبخ") || q.includes("وصفات") || q.includes("cooking") || q.includes("recipe")) {
-                loadingMessage.textContent = `For cooking and culinary arts, some of the most famous and inspiring books globally include:\n\n1. "Salt, Fat, Acid, Heat" by Samin Nosrat\n2. "The Food Lab" by J. Kenji López-Alt\n3. "Mastering the Art of French Cooking" by Julia Child\n\nAlthough our current digital library focuses on tech and business, I can help you with cooking tips, recipes, or answer any other questions you have!`;
-                return;
-            }
+            // لأي سؤال آخر في الدنيا (طبخ، برمجة، تاريخ، علوم، إلخ)، يروح للذكاء الاصطناعي مباشرة ليجيب عليه بإجابة حقيقية ومفصلة
+            const systemPrompt = `You are a brilliant, versatile, and helpful AI assistant. You can answer ANY question the user asks accurately, naturally, and in detail (whether it's about cooking, programming, science, history, or daily life). User question: ${message}`;
 
-            // للأسئلة العامة الأخرى باستخدام الذكاء الاصطناعي المباشر
-            const systemContext = `You are a helpful, brilliant, and versatile AI assistant. You can answer ANY question the user asks about cooking, science, programming, history, everyday life, or any other topic accurately and in detail. Our library collection has: ${JSON.stringify(libraryBooks)}. If the question is about tech/business, mention them; otherwise, give a full, direct, and professional answer to whatever the user asks. User question: ${message}`;
-
-            const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(systemContext)}`);
+            const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}`);
             
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+                throw new Error("Failed to fetch AI response");
             }
 
             const reply = await response.text();
@@ -185,7 +179,7 @@ const libraryBooks = [
 
         } catch (error) {
             console.error("AI Assistant Error:", error);
-            loadingMessage.textContent = `That's a great question about "${message}"! I'm here to help you with answers, tips, and book recommendations across any topic you're curious about.`;
+            loadingMessage.textContent = "I'm here and ready to help! Please try asking your question again.";
         } finally {
             isSending = false;
             input.disabled = false;
@@ -202,7 +196,7 @@ const libraryBooks = [
 
         if (!messages.dataset.initialized) {
             addMessage(
-                "Hi! 👋 I'm your Smart Library Assistant. Ask me anything—whether it's about cooking, science, programming, or our books!"
+                "Hi! 👋 I'm your Smart Assistant. You can ask me anything—recipes, programming, science, or about our library!"
             );
             messages.dataset.initialized = "true";
         }
