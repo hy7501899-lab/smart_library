@@ -137,22 +137,25 @@ const libraryBooks = [
         return bubble;
     }
 
-    // محرك ردود ذكي وشامل يقدر يرد على أي سؤال يكتبه المستخدم باحترافية تامة
+    // محرك ردود ذكي وشامل يعالج محتوى المكتبة والأسئلة العامة
     function generateAdvancedResponse(query) {
         const q = query.toLowerCase();
         
-        if (q.includes("ai") || q.includes("artificial intelligence") || q.includes("machine learning") || q.includes("ذكاء اصطناعي") || q.includes("التعلم العميق")) {
-            return "Artificial Intelligence (AI) and Machine Learning empower computers to learn from data and automate complex tasks. To master this field, I highly recommend exploring 'Artificial Intelligence' by Stuart Russell and 'Deep Learning' by Ian Goodfellow available in our library catalogue.";
+        if (q.includes("محتوى") || q.includes("مكتبه") || q.includes("كتب") || q.includes("books") || q.includes("library") || q.includes("محتوى المكتبه")) {
+            let bookList = libraryBooks.map(b => `• ${b.title} by ${b.author} (${b.category})`).join("\n");
+            return `Here is the current collection of books available in Smart Library:\n\n${bookList}\n\nYou can explore them in detail on our Catalogue page!`;
+        } else if (q.includes("ai") || q.includes("artificial intelligence") || q.includes("machine learning") || q.includes("ذكاء اصطناعي") || q.includes("التعلم العميق")) {
+            return "Artificial Intelligence (AI) and Machine Learning empower computers to learn from data. To master this field, I highly recommend exploring 'Artificial Intelligence' by Stuart Russell and 'Deep Learning' by Ian Goodfellow available in our library!";
         } else if (q.includes("program") || q.includes("code") || q.includes("python") || q.includes("java") || q.includes("c++") || q.includes("برمجة") || q.includes("كود")) {
-            return "Programming is about designing logical solutions and writing clean, efficient code. For writing maintainable software and mastering problem-solving, check out 'Clean Code' by Robert C. Martin and 'Introduction to Algorithms' by Thomas H. Cormen.";
+            return "Programming is about designing logical solutions and writing clean, efficient code. For writing maintainable software, check out 'Clean Code' by Robert C. Martin and 'Introduction to Algorithms' by Thomas H. Cormen.";
         } else if (q.includes("design") || q.includes("ui") || q.includes("ux") || q.includes("تصميم")) {
-            return "Great design focuses on user experience and simplicity, ensuring that digital and physical products are intuitive. I recommend reading 'The Design of Everyday Things' by Don Norman.";
+            return "Great design focuses on user experience and simplicity. I recommend reading 'The Design of Everyday Things' by Don Norman from our collection.";
         } else if (q.includes("business") || q.includes("startup") || q.includes("entrepreneurship") || q.includes("بزنس") || q.includes("مشروع")) {
-            return "Building a successful startup or business venture requires validating ideas quickly and adapting to market needs. An essential guide for this is 'The Lean Startup' by Eric Ries.";
+            return "Building a successful startup requires validating ideas quickly. An essential guide for this is 'The Lean Startup' by Eric Ries.";
         } else if (q.includes("hello") || q.includes("hi") || q.includes("مرحبا") || q.includes("السلام")) {
-            return "Hello! 👋 I'm your Smart Library Assistant. You can ask me any question about programming, technology, science, or general topics, and I'll help you find the right books and insights!";
+            return "Hello! 👋 I'm your Smart Library Assistant. Ask me anything about our books, programming, AI, or general topics!";
         } else {
-            return `That is a fascinating question about "${query}". As your Smart Library assistant, I am here to help you explore knowledge, understand new concepts, and discover incredible books across programming, artificial intelligence, design, and business. Feel free to ask more!`;
+            return `That's an interesting question about "${query}". As your Smart Library assistant, I'm here to help you explore knowledge and discover amazing books across programming, AI, design, and business!`;
         }
     }
 
@@ -169,7 +172,6 @@ const libraryBooks = [
 
         const loadingMessage = addMessage("Thinking... 🤖", "bot");
 
-        // محاكاة وقت التفكير بشكل واقعي واحترافي
         setTimeout(() => {
             const reply = generateAdvancedResponse(message);
             loadingMessage.textContent = reply;
@@ -178,7 +180,7 @@ const libraryBooks = [
             input.disabled = false;
             sendButton.disabled = false;
             input.focus();
-        }, 600);
+        }, 500);
     }
 
     function openChat() {
