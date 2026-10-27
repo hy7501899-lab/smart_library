@@ -1,3 +1,7 @@
+// ========================================
+// SMART LIBRARY - AUTHENTICATION SCRIPT
+// ========================================
+
 const USERS_KEY = "smartLibraryUsers";
 const SESSION_KEY = "smartLibraryCurrentUser";
 
@@ -10,9 +14,33 @@ function getUsers() {
     }
 }
 
+// 1. Check active session and update the Navbar UI on page load
+document.addEventListener("DOMContentLoaded", function () {
+    const currentUser = JSON.parse(localStorage.getItem(SESSION_KEY));
+    const authLink = document.getElementById("authLink");
+    const registerLink = document.getElementById("registerLink");
+
+    if (currentUser && currentUser.name) {
+        if (authLink) {
+            authLink.textContent = `Hi, ${currentUser.name}`;
+            authLink.href = "dashboard.html";
+        }
+        if (registerLink) {
+            registerLink.textContent = "Logout";
+            registerLink.href = "#";
+            registerLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                localStorage.removeItem(SESSION_KEY);
+                window.location.href = "index.html";
+            });
+        }
+    }
+});
+
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 
+// 2. Register logic
 if (registerForm) {
     registerForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -49,7 +77,6 @@ if (registerForm) {
             return;
         }
 
-        // Demo only: never store real passwords in LocalStorage.
         users.push({ name, email, password });
 
         try {
@@ -69,6 +96,7 @@ if (registerForm) {
     });
 }
 
+// 3. Login logic
 if (loginForm) {
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -90,7 +118,6 @@ if (loginForm) {
         }
 
         try {
-            // Save only the demo session identity, not the password.
             localStorage.setItem(
                 SESSION_KEY,
                 JSON.stringify({ name: user.name, email: user.email })
@@ -99,7 +126,7 @@ if (loginForm) {
             message.textContent = "Login successful!";
 
             setTimeout(() => {
-                window.location.href = "index.html"; // ✅ تم التعديل لتوجيه المستخدم للصفحة الرئيسية الصحيحة بدون 404
+                window.location.href = "index.html";
             }, 700);
         } catch {
             message.textContent =
