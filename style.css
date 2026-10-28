@@ -1,3 +1,37 @@
+/* ========================================
+   BACKGROUND VIDEO STYLING (خلفية الممر)
+======================================== */
+.video-background-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -999; /* عشان يفضل خلف كل محتوى الموقع */
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.library-bg-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 10, 30, 0.65); /* طبقة تعتيم عشان النصوص تكون واضحة */
+}
 /*GENERAL STYLES*/
 * {
     margin: 0;
